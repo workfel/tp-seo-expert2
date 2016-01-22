@@ -9,8 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "casperjs": "^1.1.0-beta3",
-    "node-uuid": "^1.4.7",
-    "promise": "^7.1.1"
+    "casperjs": "^1.1.0-beta3"
   }
 }

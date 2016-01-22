@@ -1,7 +1,17 @@
 var links = [];
-var casper = require('casper').create();
+
+var require = patchRequire(require);
+
+var casper = require('casper').create({
+    verbose: true,
+    logLevel: "debug",
+    onError: _onCasperError,
+    onLoadError: _onCasperLoadError
+});
 var fs = require('fs');
 var config = require('./config');
+
+var CMMSSpamer = require('./wp-spam');
 
 var Promise = require('promise');
 
@@ -45,24 +55,24 @@ casper.run(function () {
 
 });
 
+
+function _onCasperError(msg, backTrace) {
+    console.log('---   ERROR   ---');
+    console.log(msg);
+    console.log(backTrace);
+}
+
+function _onCasperLoadError(msg, backTrace) {
+    console.log('---   ERROR   ---');
+    console.log(msg);
+    console.log(backTrace);
+}
+
 //
 
 function _spam(links, cb) {
-
-    //var CMSSpamer = require('./CMSSpamer');
-    //console.log("Begin to spam");
-    // console.log(links.join('\n-'));
-
     var querystring = require('querystring');
 
-    //var url = querystring.parse(links[0].split('/url?')[1]);
-
-    //console.log(JSON.stringify(url.q));
-    //cb();
-    //_spamWebSite(url.q).then(function (result) {
-    //    console.log(result);
-    //    cb();
-    //});
 
     try {
 
@@ -74,12 +84,16 @@ function _spam(links, cb) {
                 fitst = true;
                 var url = querystring.parse(link.split('/url?')[1]);
 
+                CMMSSpamer.spamWebSite(url.q, config.CMSSnifferCommentaire, function (result) {
+                    console.log(JSON.stringify(result));
+                });
+
                 //console.log(JSON.stringify(url.q));
                 //console.log(url.q);
 
-                _spamWebSite(url.q, function (result) {
-                    console.log(JSON.stringify(result));
-                });
+                //_spamWebSite(url.q, function (result) {
+                //    console.log(JSON.stringify(result));
+                //});
             }
 
         });
@@ -182,7 +196,6 @@ function _spamWebSite(url, cb) {
 
         casperSpam.then(function () {
 
-
             //this.wait(2000, function () {
             //if (this.exists('#commentform input[type="submit"]')) {
             this.click('#commentform input[type="submit"]');
@@ -212,10 +225,5 @@ function _spamWebSite(url, cb) {
     } catch (err) {
         throw  err;
     }
-
-    //});
-
-    //return promise;
-
 
 }
